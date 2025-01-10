@@ -42,7 +42,7 @@ userRouter.post("/", async (req, res) => {
 			}).save();
 		}
 
-		const link = `${process.env.BASE_URL}/password-reset/${user._id}/${token.token}`;
+		const link = `${process.env.BASE_URL}/${user._id}/${token.token}`;
 		console.log("link", link);
 		await sendEmail(user.email, "Password reset", link);
 
@@ -70,7 +70,6 @@ userRouter.post("/:userId/:token", async (req, res) => {
 
 		user.password = req.body.password;
 		await user.save();
-		await token.delete();
 
 		res.send("password reset sucessfully.");
 	} catch (error) {
