@@ -42,13 +42,14 @@ const handlepostforgotpassword = async (req, res) => {
 		}
 
 		const link = `${process.env.BASE_URL}/${user._id}/${token.token}`;
-		console.log("link", link);
 		await sendEmail(user.email, "Password reset", link);
 
-		res.send("password reset link sent to your email account");
+		res.status(200).json({
+			status: "Success",
+			message: "password reset link sent to your email account",
+		});
 	} catch (error) {
 		res.send("An error occured");
-		console.log("error in try cache", error);
 	}
 };
 const handlepostsetpass = async (req, res) => {
@@ -69,7 +70,7 @@ const handlepostsetpass = async (req, res) => {
 		user.password = req.body.password;
 		await user.save();
 
-		res.send("password reset sucessfully.");
+		res.send(204).json({ message: "password reset sucessfully." });
 	} catch (error) {
 		res.send("An error occured");
 		console.log(error);
@@ -80,13 +81,15 @@ const handleregisteruser = async (req, res) => {
 	try {
 		const body = req.body;
 		if (!body) return res.status(400).send({ message: "invalid body" });
-		await User.create({
+		const user = await User.create({
 			fullname: body.fullname,
 			email: body.email,
 			password: body.password,
 		});
-		console.log("user created");
-		return res.redirect("/login");
+
+		return res
+			.status(201)
+			.json({ status: "Created Successfully", message: user._id });
 	} catch (err) {
 		return res.redirect("/register");
 	}
@@ -97,15 +100,19 @@ const handlepostlogin = (req, res) => {
 		const { email, password } = req.body;
 		const uid = User.matchPasswordAndGenerateToken(email, password);
 		res.cookie("uid", uid);
-		return res.redirect("/");
+		return res.status(200).json({
+			status: "Login sucessfully",
+			message: "Jwt authentication",
+		});
 	} catch (err) {
-		return res.redirect("/register", {
-			message: "invalid username and password",
+		return res.status(200).json({
+			status: "some problem...",
+			message: console.log(err),
 		});
 	}
 };
 const handlelogout = (req, res) => {
-	res.clearCookie("uid").redirect("/login");
+	res.clearCookie("uid").status(200).json({ status: "Logout success" });
 };
 
 module.exports = {
