@@ -8,6 +8,7 @@ const {
 	handlegetforgotpassword,
 	handlepostforgotpassword,
 	handlepostsetpass,
+	handlelogout,
 } = require("../controllers/user");
 const userRouter = express.Router();
 // const Token = require("../models/token");
@@ -16,7 +17,7 @@ const userRouter = express.Router();
 // const Joi = require("joi");
 // const sendEmail = require("../services/sendEmail");
 
-userRouter.get("/get", handlegetuser);
+userRouter.get("/", handlegetuser);
 userRouter.post("/register", handleregisteruser);
 userRouter.post("/login", handlepostlogin);
 userRouter.get("/register", handlegetregisteruser);
@@ -24,6 +25,7 @@ userRouter.get("/login", handlegetlogin);
 userRouter.get("/forgot-password", handlegetforgotpassword);
 userRouter.post("/", handlepostforgotpassword);
 userRouter.post("/:userId/:token", handlepostsetpass);
+userRouter.get("/logout", handlelogout);
 
 // userRouter.post("/", async (req, res) => {
 // 	try {
