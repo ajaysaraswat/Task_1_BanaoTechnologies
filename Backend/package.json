@@ -10,10 +10,13 @@
 	"license": "ISC",
 	"dependencies": {
 		"cookie-parser": "^1.4.7",
+		"dotenv": "^16.4.7",
 		"ejs": "^3.1.10",
 		"express": "^4.21.2",
+		"joi": "^17.13.3",
 		"jsonwebtoken": "^9.0.2",
-		"mongoose": "^8.9.4"
+		"mongoose": "^8.9.4",
+		"nodemailer": "^6.9.16"
 	},
 	"devDependencies": {
 		"nodemon": "^3.1.9"
