@@ -7,10 +7,7 @@ const Joi = require("joi");
 const sendEmail = require("../services/sendEmail");
 
 const handlegetuser = (req, res) => {
-	if (!req.user) res.redirect("/register");
-	return res.render("home", {
-		user: req.user,
-	});
+	return res.render("home");
 };
 
 const handlegetregisteruser = (req, res) => {
@@ -108,7 +105,7 @@ const handlepostlogin = (req, res) => {
 	}
 };
 const handlelogout = (req, res) => {
-	res.clearCookie("uid").redirect("/user/signin");
+	res.clearCookie("uid").redirect("/login");
 };
 
 module.exports = {

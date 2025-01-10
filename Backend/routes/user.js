@@ -83,7 +83,10 @@ userRouter.get("/logout", handlelogout);
 // });
 
 userRouter.get("/:userId/:token", (req, res) => {
-	return res.render("newPasswordPage");
+	return res.render("newPasswordPage", {
+		userId: req.params.userId,
+		token: req.params.token,
+	});
 });
 
 module.exports = userRouter;
