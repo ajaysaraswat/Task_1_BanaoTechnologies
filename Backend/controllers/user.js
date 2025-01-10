@@ -2,6 +2,9 @@ const crypto = require("crypto");
 require("dotenv").config();
 const nodemailer = require("nodemailer");
 const User = require("../models/user");
+const Token = require("../models/token");
+const Joi = require("joi");
+const sendEmail = require("../services/sendEmail");
 
 const handlegetuser = (req, res) => {
 	return res.render("home");
@@ -18,54 +21,58 @@ const handlegetlogin = (req, res) => {
 const handlegetforgotpassword = (req, res) => {
 	return res.render("forgotpass");
 };
+
 const handlepostforgotpassword = async (req, res) => {
 	try {
-		const { email } = req.body;
+		const schema = Joi.object({ email: Joi.string().email().required() });
+		const { error } = schema.validate(req.body);
+		if (error) return res.status(400).send(error.details[0].message);
 
-		// Find the user by email
-		const user = await User.findOne({ email });
+		const user = await User.findOne({ email: req.body.email });
 		console.log("user", user);
-		if (!user) {
-			return res.status(404).json({ message: "Email not found" });
+		if (!user)
+			return res.status(400).send("user with given email doesn't exist");
+
+		let token = await Token.findOne({ userId: user._id });
+		if (!token) {
+			token = await new Token({
+				userId: user._id,
+				token: crypto.randomBytes(32).toString("hex"),
+			}).save();
 		}
 
-		// Generate a reset token and expiration
-		const resetToken = crypto.randomBytes(32).toString("hex");
+		const link = `${process.env.BASE_URL}/${user._id}/${token.token}`;
+		console.log("link", link);
+		await sendEmail(user.email, "Password reset", link);
 
-		user.resetPasswordToken = resetToken;
-		user.resetPasswordExpires = Date.now() + 3600000; // 1 hour from now
+		res.send("password reset link sent to your email account");
+	} catch (error) {
+		res.send("An error occured");
+		console.log("error in try cache", error);
+	}
+};
+const handlepostsetpass = async (req, res) => {
+	try {
+		const schema = Joi.object({ password: Joi.string().required() });
+		const { error } = schema.validate(req.body);
+		if (error) return res.status(400).send(error.details[0].message);
+
+		const user = await User.findById(req.params.userId);
+		if (!user) return res.status(400).send("invalid link or expired");
+
+		const token = await Token.findOne({
+			userId: user._id,
+			token: req.params.token,
+		});
+		if (!token) return res.status(400).send("Invalid link or expired");
+
+		user.password = req.body.password;
 		await user.save();
 
-		// Configure the email transporter
-		const transporter = nodemailer.createTransport({
-			service: "Gmail",
-			auth: {
-				user: process.env.EMAIL_USER,
-				pass: process.env.EMAIL_PASS,
-			},
-		});
-
-		const resetURL = `http://${req.headers.host}/reset-password/${resetToken}`;
-
-		const mailOptions = {
-			to: user.email,
-			from: process.env.EMAIL_USER,
-			subject: "Password Reset Request",
-			text: `You are receiving this because you (or someone else) have requested a password reset.\n\n
-Please click on the following link, or paste it into your browser to complete the process:\n\n
-${resetURL}\n\n
-If you did not request this, please ignore this email and your password will remain unchanged.\n`,
-		};
-
-		// Send the email
-		await transporter.sendMail(mailOptions);
-
-		res
-			.status(200)
-			.json({ message: "Password reset email sent successfully." });
+		res.send("password reset sucessfully.");
 	} catch (error) {
-		console.error("Error in forgot password handler:", error);
-		res.status(500).json({ message: "An error occurred. Please try again." });
+		res.send("An error occured");
+		console.log(error);
 	}
 };
 
@@ -106,4 +113,5 @@ module.exports = {
 	handlegetlogin,
 	handlegetforgotpassword,
 	handlepostforgotpassword,
+	handlepostsetpass,
 };

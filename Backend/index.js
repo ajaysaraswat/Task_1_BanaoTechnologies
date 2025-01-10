@@ -1,7 +1,7 @@
 const express = require("express");
 const { connecttoMongoDB } = require("./connection/connection");
 const userRouter = require("./routes/user");
-
+const { checkForAuthenticationCookie } = require("./middlewares/auth");
 const path = require("path");
 const cookieParsar = require("cookie-parser");
 const app = express();
@@ -12,6 +12,7 @@ connecttoMongoDB("mongodb://127.0.0.1:27017/BanaoDatabase");
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParsar());
+app.use(checkForAuthenticationCookie("uid"));
 
 app.use("/", userRouter);
 
