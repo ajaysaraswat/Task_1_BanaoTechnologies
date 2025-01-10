@@ -1,7 +1,15 @@
 const User = require("../models/user");
 
 const handlegetuser = (req, res) => {
-	return res.status(200).send({ message: "successful get" });
+	return res.render("home");
+};
+
+const handlegetregisteruser = (req, res) => {
+	return res.render("register");
+};
+
+const handlegetlogin = (req, res) => {
+	return res.render("login");
 };
 
 const handleregisteruser = async (req, res) => {
@@ -14,9 +22,9 @@ const handleregisteruser = async (req, res) => {
 			password: body.password,
 		});
 		console.log("user created");
-		return res.status(201).json({ message: "user created" });
+		return res.redirect("/login");
 	} catch (err) {
-		throw console.error("Error", err);
+		return res.redirect("/register");
 	}
 };
 
@@ -37,4 +45,6 @@ module.exports = {
 	handlegetuser,
 	handleregisteruser,
 	handlepostlogin,
+	handlegetregisteruser,
+	handlegetlogin,
 };
