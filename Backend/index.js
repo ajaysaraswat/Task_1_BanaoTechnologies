@@ -4,7 +4,7 @@ const userRouter = require("./routes/user");
 
 const app = express();
 const PORT = 8000;
-
+app.use(express.urlencoded({ extended: false }));
 connecttoMongoDB("mongodb://127.0.0.1:27017/BanaoDatabase");
 
 app.use("/", userRouter);
