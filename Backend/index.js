@@ -5,7 +5,7 @@ const { checkForAuthenticationCookie } = require("./middlewares/auth");
 const path = require("path");
 const cookieParsar = require("cookie-parser");
 const app = express();
-const PORT = 8000;
+const PORT = 3000;
 
 connecttoMongoDB("mongodb://127.0.0.1:27017/BanaoDatabase");
 
