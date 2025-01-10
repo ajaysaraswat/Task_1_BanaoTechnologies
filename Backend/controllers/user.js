@@ -4,7 +4,7 @@ const handlegetuser = (req, res) => {
 	return res.status(200).send({ message: "successful get" });
 };
 
-const handlepostuser = async (req, res) => {
+const handleregisteruser = async (req, res) => {
 	try {
 		const body = req.body;
 		if (!body) return res.status(400).send({ message: "invalid body" });
@@ -20,7 +20,21 @@ const handlepostuser = async (req, res) => {
 	}
 };
 
+const handlepostlogin = (req, res) => {
+	try {
+		const { email, password } = req.body;
+		const uid = User.matchPasswordAndGenerateToken(email, password);
+		res.cookie("uid", uid);
+		return res.redirect("/");
+	} catch (err) {
+		return res.redirect("/register", {
+			message: "invalid username and password",
+		});
+	}
+};
+
 module.exports = {
 	handlegetuser,
-	handlepostuser,
+	handleregisteruser,
+	handlepostlogin,
 };

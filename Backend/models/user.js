@@ -37,5 +37,21 @@ userSchema.pre("save", function (next) {
 	next();
 });
 
+userSchema.static(
+	"matchPasswordAndGenerateToken",
+	async function (email, password) {
+		const user = await this.findOne({ email });
+		if (!user) throw new Error("User dont found");
+		const salt = user.salt;
+		const hashedPassword = user.password;
+		const userProvidedHash = createHmac("sha256", salt)
+			.update(password)
+			.digest("hex");
+		if (hashedPassword !== userProvidedHash) throw new Error("User dont found");
+		const token = setuser(user);
+
+		return token;
+	}
+);
 const User = mongoose.model("User", userSchema);
 module.exports = User;
