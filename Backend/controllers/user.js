@@ -70,7 +70,7 @@ const handlepostsetpass = async (req, res) => {
 		user.password = req.body.password;
 		await user.save();
 
-		res.send(204).json({ message: "password reset sucessfully." });
+		return res.status(200).json({ message: "password reset sucessfully." });
 	} catch (error) {
 		res.send("An error occured");
 		console.log(error);
